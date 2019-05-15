@@ -1,6 +1,8 @@
 import math
+import os
 import pandas as pd
 import numpy as np
+import pickle
 
 
 def createDataSet():
@@ -92,8 +94,6 @@ def create_tree(df, ds_tree, labels):
     #return
     if not labels:
         return
-
-
     # select a feature whose info gain max
     feature = choose_label(df)
 
@@ -116,9 +116,11 @@ def create_tree(df, ds_tree, labels):
     else:
         labels.remove(feature)
 
-def main():
-    # data_set,labels =  createDataSet()
-    # shanno_ent(data_set, -1)
+def cache_tree():
+    if os.path.exists("ds_tree"):
+        with open("ds_tree", "rb") as f:
+            return pickle.load(f)
+
     data_set,labels =  createDataSet()
     columns=["age", "work", "house", "borrow", "class"]
     df = pd.DataFrame(data=data_set, columns=columns)
@@ -126,7 +128,38 @@ def main():
     ds_tree = {}
     columns.remove("class")
     create_tree(df, ds_tree, columns)
-    print(ds_tree)
+    with open("ds_tree", "wb") as f:
+        pickle.dump(ds_tree, f)
+        return ds_tree
+
+def predict(df, ds_tree):
+    for i in range( df.shape[0] ):
+        print(df)
+        row = df.iloc[i,:]
+        print(row)
+        while 1:
+            try:
+                label, child_tree = ds_tree.popitem()
+            except FileNotFoundError as ffe:
+                return ds_tree
+            except AttributeError as ae:
+                return ds_tree
+            print(child_tree)
+            print(row[label])
+            ds_tree = child_tree[row[label]]
+            print(ds_tree)
+            # row[ds_tree.keys()[0]]
+
+def main():
+    # data_set,labels =  createDataSet()
+    # shanno_ent(data_set, -1)
+    ds_tree = cache_tree()
+    ds, la = createDataSet()
+
+    columns=["age", "work", "house", "borrow", "class"]
+    df = pd.DataFrame(data=ds, columns=columns)
+    res = predict(df, ds_tree)
+    print("predict result is '{}'".format(res))
 
 
 if __name__ == "__main__":
