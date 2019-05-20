@@ -1,13 +1,15 @@
 import numpy as np
 import operator
 
+
 def create_data_set():
     '''
     create data set for knn
     '''
-    datas = np.array([[1, 101],[5, 89],[108, 5],[115, 8]])
+    datas = np.array([[1, 101], [5, 89], [108, 5], [115, 8]])
     labels = [0, 0, 1, 1]  # 0->emotion 1->action
     return datas, labels
+
 
 def knn_classify(predict, datas, labels, k):
     '''
@@ -26,8 +28,11 @@ def knn_classify(predict, datas, labels, k):
         label = labels[sort_index[i]]
         class_count[label] = class_count.get(label, 0) + 1
     print(diff_mat)
-    sorted_class_count = sorted(class_count.items(), key=operator.itemgetter(1), reverse=True)
+    sorted_class_count = sorted(class_count.items(),
+                                key=operator.itemgetter(1),
+                                reverse=True)
     return sorted_class_count[0][0]
+
 
 def main():
     datas, labels = create_data_set()
@@ -35,6 +40,7 @@ def main():
     result = knn_classify(tdata, datas, labels, 3)
     print("result is")
     print(result)
+
 
 if __name__ == "__main__":
     main()

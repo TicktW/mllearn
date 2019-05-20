@@ -11,6 +11,7 @@ label_map = {
     'largeDoses': 3,
 }
 
+
 def file2matrix():
     # open and read file
     with open("./datingTestSet.txt") as f:
@@ -23,30 +24,50 @@ def file2matrix():
     for line_nu, array_line in enumerate(array_lines):
         # print(line_nu,array_line)
         line_list = array_line.split()
-        ret_mat[line_nu,0:3] = line_list[0:3]
+        ret_mat[line_nu, 0:3] = line_list[0:3]
         label_vector.append(label_map[line_list[-1]])
     # print(ret_mat[1,:])
     # print(label_vector)
     return ret_mat, label_vector
 
-def show_data(mat, labels):
-    fig, axs = plt.subplots(nrows=2, ncols=2, sharex=False, sharey=False, figsize=(13, 8))
-    # number_labels = len(labels)
-    label_colors = ["black" if label==1 else ("orange" if label==2 else "red") for label in labels]
 
-    axs[0][0].scatter(x=mat[:, 0], y=mat[:, 1], color=label_colors, s=5, alpha=0.5)
+def show_data(mat, labels):
+    fig, axs = plt.subplots(nrows=2,
+                            ncols=2,
+                            sharex=False,
+                            sharey=False,
+                            figsize=(13, 8))
+    # number_labels = len(labels)
+    label_colors = [
+        "black" if label == 1 else ("orange" if label == 2 else "red")
+        for label in labels
+    ]
+
+    axs[0][0].scatter(x=mat[:, 0],
+                      y=mat[:, 1],
+                      color=label_colors,
+                      s=5,
+                      alpha=0.5)
     # print(label_colors)
     axs[0][0].set_title(u"fly distance and play games")
     axs[0][0].set_xlabel(u"fly")
     axs[0][0].set_ylabel(u"games")
 
-    axs[0][1].scatter(x=mat[:, 0], y=mat[:, 2], color=label_colors, s=5, alpha=0.5)
+    axs[0][1].scatter(x=mat[:, 0],
+                      y=mat[:, 2],
+                      color=label_colors,
+                      s=5,
+                      alpha=0.5)
     # print1label_colors)
     axs[0][1].set_title(u"fly distance and ice cream")
     axs[0][1].set_xlabel(u"fly")
     axs[0][1].set_ylabel(u"cream")
 
-    axs[1][0].scatter(x=mat[:, 1], y=mat[:, 2], color=label_colors, s=5, alpha=0.5)
+    axs[1][0].scatter(x=mat[:, 1],
+                      y=mat[:, 2],
+                      color=label_colors,
+                      s=5,
+                      alpha=0.5)
     # pr1nt(label_colors)
     axs[1][0].set_title(u"play games and ice cream")
     axs[1][0].set_xlabel(u"games")
@@ -55,6 +76,7 @@ def show_data(mat, labels):
     # add legend
     plt.show()
 
+
 def norm(datas):
     min_vals = datas.min(0)
     max_val = datas.max(0)
@@ -62,10 +84,11 @@ def norm(datas):
     ranges = max_val - min_vals
     norm_datas = np.zeros(np.shape(datas))
     row_len = datas.shape[0]
-    norm_datas  = datas - np.tile(min_vals, (row_len,1))
-    norm_datas = norm_datas / np.tile(ranges, (row_len,1))
+    norm_datas = datas - np.tile(min_vals, (row_len, 1))
+    norm_datas = norm_datas / np.tile(ranges, (row_len, 1))
     print(norm_datas)
     return norm_datas, ranges, min_vals
+
 
 def knn_classify(predict, datas, labels, k):
     '''
@@ -86,8 +109,11 @@ def knn_classify(predict, datas, labels, k):
         label = labels[sort_index[i]]
         class_count[label] = class_count.get(label, 0) + 1
     print(diff_mat)
-    sorted_class_count = sorted(class_count.items(), key=operator.itemgetter(1), reverse=True)
+    sorted_class_count = sorted(class_count.items(),
+                                key=operator.itemgetter(1),
+                                reverse=True)
     return sorted_class_count[0][0]
+
 
 def date_class_test():
     mat, labels = file2matrix()
@@ -96,16 +122,18 @@ def date_class_test():
     m = norm_mat.shape[0]
 
     ho_ratio = 0.1
-    nums_test = int(m*ho_ratio)
+    nums_test = int(m * ho_ratio)
     err_count = 0.0
     for i in range(nums_test):
-        res = knn_classify(norm_mat[i,:], norm_mat[nums_test:m, :], labels[nums_test:m], 4)
+        res = knn_classify(norm_mat[i, :], norm_mat[nums_test:m, :],
+                           labels[nums_test:m], 4)
         print("分类结果{}, 真实的类别{}".format(res, labels[i]))
         if res != labels[i]:
             err_count += 1.0
 
-    print("错误率{}%".format(err_count/float(nums_test)*100))
+    print("错误率{}%".format(err_count / float(nums_test) * 100))
     # show_data(mat, labels)
+
 
 def knn_input():
     # get input
@@ -121,15 +149,22 @@ def knn_input():
 
     res = knn_classify(np_arr_to1, norm_mat, labels, 4)
     # print(res)
-    labels_revert = {v:k for k,v in label_map.items()}  # revert the label map
-    print("you may {} the {}".format(labels_revert[res], dict(zip(("fly","games","cream"), [fly_distance, play_games, ice_cream]))))
+    labels_revert = {v: k
+                     for k, v in label_map.items()}  # revert the label map
+    print("you may {} the {}".format(
+        labels_revert[res],
+        dict(
+            zip(("fly", "games", "cream"),
+                [fly_distance, play_games, ice_cream]))))
+
 
 def main():
-    # mat, labels = file2matrix()
+    mat, labels = file2matrix()
     # norm(mat)
-    # show_data(mat, labels)
+    show_data(mat, labels)
     # date_class_test()
-    knn_input()
+    # knn_input()
+
 
 if __name__ == "__main__":
     main()
